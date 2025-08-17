@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task List</title>
+    <link rel="stylesheet" href="{% static 'todolist/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <div class="todo-container">
+        <h1>📝 Task List</h1>
+
+        <div class="auth-buttons">
+            {% if user.is_authenticated %}
+                <span class="welcome-msg">Welcome, {{ user.username }}</span>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="auth-btn logout-btn">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="auth-btn login-btn">Login</a>
+                <a href="{% url 'register' %}" class="auth-btn register-btn">Register</a>
+            {% endif %}
+        </div>
+
+        {% if user.is_authenticated %}
+        <form class="todo-form">
+            <button type="submit"><a href="{% url 'task_create' %}">➕ Add</a></button>
+        </form>
+
+        <ul class="todo-list">
+            {% for task in tasks %}
+            <li class="task">
+                <span>{% if task.complete %}✔️{% else %}❌{% endif %}</span>
+                <span><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></span>
+                <a href="{% url 'task_update' task.id %}">✏️</a>
+                <form method="POST" action="{% url 'task_delete' task.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">🗑️</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</body>
+</html>
